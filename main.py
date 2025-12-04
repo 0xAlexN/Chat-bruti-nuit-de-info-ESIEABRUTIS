@@ -1,19 +1,21 @@
 from flask import Flask, render_template, request, jsonify
-import ollama
+from openai import OpenAI
 import os
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
-# Configuration Ollama
-OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'http://localhost:11434')
-if OLLAMA_HOST:
-    os.environ['OLLAMA_HOST'] = OLLAMA_HOST
+# Configuration DeepSeek API
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', '')
+DEEPSEEK_BASE_URL = os.getenv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com')
 
-# Créer le client Ollama explicitement
-ollama_client = ollama.Client(host=OLLAMA_HOST)
+# Créer le client DeepSeek (OpenAI-compatible)
+client = OpenAI(
+    api_key=DEEPSEEK_API_KEY,
+    base_url=DEEPSEEK_BASE_URL
+)
 
-# Le nom exact du modèle
-model_name = os.getenv('OLLAMA_MODEL', 'gemma3:270m')
+# Le nom du modèle DeepSeek
+model_name = os.getenv('DEEPSEEK_MODEL', 'deepseek-chat')
 
 SYSTEM_PROMPT = """
 Tu es Chat-bruti, un assistant complètement stupide et à côté de la plaque.
@@ -46,15 +48,18 @@ def chat():
     user_message = request.json.get('message', '')
     
     try:
-        response = ollama_client.chat(model=model_name, messages=[
-            {'role': 'system', 'content': SYSTEM_PROMPT},
-            {'role': 'user', 'content': user_message},
-        ])
-        bot_reply = response['message']['content']
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {'role': 'system', 'content': SYSTEM_PROMPT},
+                {'role': 'user', 'content': user_message},
+            ]
+        )
+        bot_reply = response.choices[0].message.content
         return jsonify({'response': bot_reply})
     except Exception as e:
         error_msg = str(e)
-        app.logger.error(f"Erreur Ollama: {error_msg}")
+        app.logger.error(f"Erreur DeepSeek API: {error_msg}")
         return jsonify({'response': f"Ah, le néant m'envahit... (Erreur: {error_msg})"}), 500
 
 if __name__ == '__main__':
