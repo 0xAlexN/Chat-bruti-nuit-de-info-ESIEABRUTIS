@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat-bruti - Le Philosophe du Dimanche</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Chat-bruti</h1>
+            <p class="subtitle">L'intelligence artificielle...ment inutile.</p>
+        </header>
+        
+        <div id="chat-box">
+            <div class="message bot">
+                <div class="avatar">🤪</div>
+                <div class="text">Salutations, mortel. Je suis Chat-bruti. Pose-moi une question, que je puisse l'ignorer avec panache.</div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Écris quelque chose (je m'en fiche)...">
+            <button id="send-btn">Déranger</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
